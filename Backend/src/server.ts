@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import { Server } from 'socket.io';
 import { createServer } from "http";
+import router from "./routes/apiRoutes";
 
 const app = express();
 const server = createServer(app);
@@ -13,9 +14,7 @@ app.use(cors());
 app.use(express.json());
 
 
-app.get('/',(req,res) => {
-    res.status(200).send('Server is running')
-})
+app.use('/',router);
 const io = new Server(server, {cors: {origin: "*"}});
 io.on('connection', (socket) => {
 })
