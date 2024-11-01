@@ -1,6 +1,6 @@
 import dotenv from 'dotenv';
 import mongoose, { Connection } from 'mongoose';
-import { deflate } from 'zlib';
+
 
 dotenv.config();
 
@@ -44,7 +44,7 @@ class DbConnection {
         try{
             await DbConnection.connection.close();
             this.isConnected = false;
-            console.log('disconnected of MongoDB');
+            console.log('disconnected MongoDB');
         }catch(error){
             console.error('Error Disconnecting to MongoDB');
         }
