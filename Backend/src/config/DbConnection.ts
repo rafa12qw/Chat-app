@@ -1,5 +1,6 @@
 import dotenv from 'dotenv';
 import mongoose, { Connection } from 'mongoose';
+import { deflate } from 'zlib';
 
 dotenv.config();
 
@@ -13,7 +14,15 @@ class DbConnection {
         this.isConnected = false;
     }
 
-    async connect(): Promise<void>{
+    
+    public getisConnected() : boolean {
+        return this.isConnected;
+    }
+    
+    public getConnection(): Connection{
+        return DbConnection.connection;
+    }
+    public async connect(): Promise<void>{
         if(this.isConnected){
             console.log('You are already connected')
             return;
@@ -27,7 +36,7 @@ class DbConnection {
         }
     }
 
-    async disconnect():Promise<void>{
+    public async disconnect():Promise<void>{
         if(!this.isConnected){
             console.log('You are not Connected');
             return;
@@ -41,3 +50,5 @@ class DbConnection {
         }
     }
 }
+
+export default DbConnection;
