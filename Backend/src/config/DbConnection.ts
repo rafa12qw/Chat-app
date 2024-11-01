@@ -1,11 +1,11 @@
 import dotenv from 'dotenv';
-import mongoose from 'mongoose';
+import mongoose, { Connection } from 'mongoose';
 
 dotenv.config();
 
 class DbConnection {
     private uri : string;
-    private static connection: any;
+    private static connection: Connection;
     private isConnected: boolean;
 
     constructor(){
@@ -13,13 +13,13 @@ class DbConnection {
         this.isConnected = false;
     }
 
-    async connect(){
+    async connect(): Promise<void>{
         if(this.isConnected){
             console.log('You are already connected')
             return;
         }
         try{
-            DbConnection.connection = await mongoose.connect(this.uri);
+            DbConnection.connection = (await mongoose.connect(this.uri)).connection;
             this.isConnected = true;
             console.log('Connected to MongoDB');
         }catch(error){
@@ -27,7 +27,7 @@ class DbConnection {
         }
     }
 
-    async disconnect(){
+    async disconnect():Promise<void>{
         if(!this.isConnected){
             console.log('You are not Connected');
             return;
