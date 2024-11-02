@@ -1,4 +1,5 @@
 import { Document, HydratedDocument, Model } from "mongoose";
+import { IChat } from "./IChat";
 
 interface IUser extends Document{
     username: string,
@@ -9,7 +10,7 @@ interface IUser extends Document{
 
 interface IUserMethods{
 
-    getAllChats(): string[];
+    getAllChats(): IChat[];
     putChatFirst(id?: string): void;
 }
 

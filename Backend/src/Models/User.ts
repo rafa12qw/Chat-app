@@ -1,6 +1,7 @@
 import { model, Schema } from "mongoose";
 import { IUser, IUserMethods, UserModel } from "../interfaces/IUser";
-
+import { IChat } from "../interfaces/IChat";
+import Chat from './Chat'
 const userSchema = new Schema<IUser, UserModel, IUserMethods>({
     username: {type: String, required:true},
     password: {type: String, required: true},
@@ -14,12 +15,20 @@ userSchema.static('createUser', function createUser(newUser: IUser){
 
 userSchema.static('getById', async function getById(id: string){
     const user = await this.findById({id});
-    return user;
+    return user // it could be null 
 })
 
 userSchema.method('getAllChats', function getAllChats(){
-    let usersId: string[] = [];
-    for
+    let res: IChat[] = [];
+    if (this.chats){
+        for(let chatId of this.chats){
+            const chat = Chat.getChatById(chatId);
+            if (chat){
+                res.push(chat);
+            }
+        } 
+    }
+    return res;
 })
 
 userSchema.method('putChatInFirst', function(id: string){

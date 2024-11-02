@@ -9,3 +9,30 @@ const chatSchema = new Schema<IChat, ChatModel, IChatMethods>({
     avatarGroupe: {type: String, required: false}
 })
 
+chatSchema.static('createChat', function createChat(newChat: IChat){
+    if(!newChat.nbUsers){
+        newChat.nbUsers = 2;
+        this.create(newChat);
+    }else{
+        this.create(newChat);
+    }
+})
+
+chatSchema.static('getChatById', async function getChatById(id: string){
+    const chat = await this.findById(id);
+    return chat //it could be null
+})
+
+
+chatSchema.method('addMessage', function addMessage(idMessage: string) {
+    if (this.messages){
+        this.messages.push(idMessage);
+    }else{
+        this.messages = [idMessage];
+    }
+})
+
+
+const Chat = model<IChat,ChatModel>('Chat',chatSchema);
+
+export default Chat;
