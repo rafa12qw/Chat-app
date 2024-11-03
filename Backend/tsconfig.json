@@ -97,6 +97,6 @@
     // "skipDefaultLibCheck": true,                      /* Skip type checking .d.ts files that are included with TypeScript. */
     "skipLibCheck": true                                 /* Skip type checking all .d.ts files. */
   },
-  "include": ["src/**/*","tests"],       // Incluir archivos dentro de 'src'
+  "include": ["src/**/*","tests", "src/controllers/UserController.ts"],       // Incluir archivos dentro de 'src'
   "exclude": ["node_modules"]    // Excluir archivos de node_modules
 }

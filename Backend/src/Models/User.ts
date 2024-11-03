@@ -9,13 +9,18 @@ const userSchema = new Schema<IUser, UserModel, IUserMethods>({
     chats: [{type: Schema.Types.ObjectId, ref:'Chat'}]
 })
 
-userSchema.static('createUser', function createUser(newUser: IUser){
+userSchema.static('createUser',function createUser(newUser: IUser){
     return this.create(newUser);
 })
 
 userSchema.static('getById', async function getById(id: string){
     const user = await this.findById({id});
     return user // it could be null 
+})
+
+userSchema.static('getByUsername', async function getByUsername(username: string){
+    const user = await this.findOne({username})
+    return user
 })
 
 userSchema.method('getAllChats', function getAllChats(){

@@ -1,7 +1,7 @@
-import { Document, HydratedDocument, Model } from "mongoose";
+import { HydratedDocument, Model } from "mongoose";
 import { IChat } from "./IChat";
 
-interface IUser extends Document{
+interface IUser{
     username: string,
     password: string,
     avatar?: string,
@@ -17,7 +17,8 @@ interface IUserMethods{
 interface UserModel extends Model<IUser, {},IUserMethods>{
 
     createUser(newUser: IUser): Promise<HydratedDocument<IUser,IUserMethods>>;
-    getUserById(id?: string): IUser | null;
+    getUserById(id?: string): HydratedDocument<IUser,IUserMethods> | null;
+    getUserByUsername(username: string): HydratedDocument<IUser,IUserMethods> | null;
     
 }
 
