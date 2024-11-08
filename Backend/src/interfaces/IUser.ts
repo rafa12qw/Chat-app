@@ -1,4 +1,4 @@
-import { HydratedDocument, Model } from "mongoose";
+import { HydratedDocument, Model, Types} from "mongoose";
 import { IChat } from "./IChat";
 
 interface IUser{
@@ -6,20 +6,21 @@ interface IUser{
     password: string,
     avatar?: string,
     chats?: string[] //string of ids of chats that the users participates
+    socketId?: string
 }
 
 interface IUserMethods{
-
-    getAllChats(): IChat[];
-    putChatFirst(id?: string): void;
+    putChatFirst(id?: Types.ObjectId): void;
+    putNewChat(idNewChat: Types.ObjectId): void;
+    putSocketID(socketId: string): void;
 }
 
 interface UserModel extends Model<IUser, {},IUserMethods>{
-
+    getUsersFromUser(ids?: Types.ObjectId): Promise<HydratedDocument<IUser,IUserMethods>[]>;
     createUser(newUser: IUser): Promise<HydratedDocument<IUser,IUserMethods>>;
-    getUserById(id?: string): HydratedDocument<IUser,IUserMethods> | null;
-    getUserByUsername(username: string): HydratedDocument<IUser,IUserMethods> | null;
-    
+    getUserById(id?: Types.ObjectId): Promise<HydratedDocument<IUser,IUserMethods>>;
+    getUserByUsername(username: string): Promise<HydratedDocument<IUser,IUserMethods>>;
+    getUserBySearch(searchTerm: any):  Promise<HydratedDocument<IUser,IUserMethods>[]>;
 }
 
 export { IUser, IUserMethods, UserModel};

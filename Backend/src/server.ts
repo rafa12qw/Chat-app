@@ -3,7 +3,7 @@ import cors from "cors";
 import { Server } from 'socket.io';
 import { createServer } from "http";
 import router from "./routes/apiRoutes";
-
+ 
 const app = express();
 const server = createServer(app);
 const port = 3001;
@@ -18,7 +18,7 @@ app.use('/',router);
 const io = new Server(server, {cors: {origin: "*"}});
 io.on('connection', (socket) => {
 })
-export default io;
 server.listen(port, ()=> {
     console.log(`Server is running in port ${port}`)
 })
+export default io;

@@ -18,18 +18,26 @@ chatSchema.static('createChat', function createChat(newChat: IChat){
     }
 })
 
-chatSchema.static('getChatById', async function getChatById(id: string){
+chatSchema.static('getChatById', async function getChatById(id){
     const chat = await this.findById(id);
     return chat //it could be null
 })
 
-
-chatSchema.method('addMessage', function addMessage(idMessage: string) {
+chatSchema.static('getAllChatOfUser', async function getAllChatOfUser(idUser){
+    const chat = await this.find({users: idUser}).select('users');
+    return chat
+})
+chatSchema.static('getChatByUsers', async function getChatByUsers(idUser1, idUser2){
+    const chat = await this.findOne({users: {$all: [idUser1, idUser2]}});
+    return chat
+})
+chatSchema.method('addMessage', function addMessage(idMessage) {
     if (this.messages){
         this.messages.push(idMessage);
     }else{
         this.messages = [idMessage];
     }
+    this.save();
 })
 
 

@@ -6,7 +6,8 @@ const userSchema = new Schema<IUser, UserModel, IUserMethods>({
     username: {type: String, required:true},
     password: {type: String, required: true},
     avatar: {type: String, required:false},
-    chats: [{type: Schema.Types.ObjectId, ref:'Chat'}]
+    chats: [{type: Schema.Types.ObjectId, ref:'Chat'}],
+    socketId: {type: String, required: false}
 })
 
 userSchema.static('createUser',function createUser(newUser: IUser){
@@ -18,25 +19,22 @@ userSchema.static('getById', async function getById(id: string){
     return user // it could be null 
 })
 
-userSchema.static('getByUsername', async function getByUsername(username: string){
+userSchema.static('getByUsername', async function getByUsername(username){
     const user = await this.findOne({username})
     return user
 })
 
-userSchema.method('getAllChats', function getAllChats(){
-    let res: IChat[] = [];
-    if (this.chats){
-        for(let chatId of this.chats){
-            const chat = Chat.getChatById(chatId);
-            if (chat){
-                res.push(chat);
-            }
-        } 
-    }
-    return res;
+userSchema.static('getBySearch', async function getBySearch(searchTerm){
+    const user = await this.findOne({username: { $regex: searchTerm, $options: 'i' }})
+    return user;
 })
 
-userSchema.method('putChatInFirst', function(id: string){
+userSchema.static('getAllUsersFromUser', async function getAllChatsOfUser(ids){
+    const users = await User.find({_id: {$in: Array.from(ids)}});
+    return users;
+})
+
+userSchema.method('putChatInFirst', function(id){
     if (!this.chats){
         this.chats = [id];
     }else{
@@ -44,6 +42,22 @@ userSchema.method('putChatInFirst', function(id: string){
             this.chats.unshift(id);
         }
     }
+    this.save();
+})
+
+userSchema.method('putNewChat', function putNewChat(idNewChat){
+    if(!this.chats){
+        this.chats = [idNewChat];
+    }else{
+        if(!this.chats.includes(idNewChat)){
+            this.chats.push(idNewChat);
+        }
+    }
+    this.save()
+})
+
+userSchema.method('putSocketID', function putSocketID(socketId){
+    this.socketId = socketId;
 })
 const User = model<IUser,UserModel>('User',userSchema);
 
