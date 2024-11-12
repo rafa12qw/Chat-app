@@ -23,9 +23,9 @@ chatSchema.static('getChatById', async function getChatById(id){
     return chat //it could be null
 })
 
-chatSchema.static('getAllChatOfUser', async function getAllChatOfUser(idUser){
-    const chat = await this.find({users: idUser}).select('users');
-    return chat
+chatSchema.static('getAllChatsOfUser', async function getAllChatsOfUser(idUser){
+    const chats = await this.find({users: {$in : idUser}}).select('users');
+    return chats
 })
 chatSchema.static('getChatByUsers', async function getChatByUsers(idUser1, idUser2){
     const chat = await this.findOne({users: {$all: [idUser1, idUser2]}});

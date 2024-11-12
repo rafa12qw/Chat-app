@@ -14,7 +14,6 @@ interface IChatMethods{
 
 interface ChatModel extends Model<IChat, {}, IChatMethods>{
     getAllChatsOfUser(idUser: Types.ObjectId): Promise<HydratedDocument<IChat,IChatMethods>[]>;
-    getAllChatOfUser(idUser: Types.ObjectId): Promise<HydratedDocument<IChat,IChatMethods>[]>;
     createChat(newChat: IChat): Promise<HydratedDocument<IChat,IChatMethods>>;
     getChatById(id: Types.ObjectId): Promise<HydratedDocument<IChat,IChatMethods>>;
     getChatByUsers(idUser1: Types.ObjectId, idUser2: Types.ObjectId): Promise<HydratedDocument<IChat,IChatMethods>>;

@@ -3,7 +3,7 @@ import { IMessage, MessageModel } from "../interfaces/IMessage";
 
 const messageSchema = new Schema<IMessage, MessageModel>({
     from: {type: Schema.Types.ObjectId, ref: 'User', required: true},
-    to: {type: Schema.Types.ObjectId, ref: 'User', required: true},
+    to: {type: Schema.Types.ObjectId, ref: 'Chat', required: true},
     content: {type: String,required: true},
     createdAt: {type: Date, default:Date.now}
 })

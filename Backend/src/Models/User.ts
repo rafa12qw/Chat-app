@@ -29,10 +29,7 @@ userSchema.static('getBySearch', async function getBySearch(searchTerm){
     return user;
 })
 
-userSchema.static('getAllUsersFromUser', async function getAllChatsOfUser(ids){
-    const users = await User.find({_id: {$in: Array.from(ids)}});
-    return users;
-})
+
 
 userSchema.method('putChatInFirst', function(id){
     if (!this.chats){

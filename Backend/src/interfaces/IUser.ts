@@ -1,11 +1,10 @@
 import { HydratedDocument, Model, Types} from "mongoose";
 import { IChat } from "./IChat";
-
 interface IUser{
     username: string,
     password: string,
     avatar?: string,
-    chats?: string[] //string of ids of chats that the users participates
+    chats?: Types.ObjectId[] //string of ids of chats that the users participates
     socketId?: string
 }
 

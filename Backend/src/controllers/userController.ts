@@ -13,10 +13,6 @@ import { Types } from 'mongoose';
 dotenv.config();
 
 class UserController{
-    private chatController;
-    constructor(){
-        this.chatController = new ChatController();
-    }
     public generateToken(_id: Types.ObjectId, username: string): string {
         if (!process.env.JWT_SECRET_KEY) {
             throw new Error("JWT_SECRET_KEY is not defined in the environment variables.");
@@ -42,12 +38,17 @@ class UserController{
     }
     
     public async getUserByDecodeToken(decodeToken: any){
-        if (decodeToken && typeof decodeToken !== 'string' && 'username' in decodeToken) {
-            const username = decodeToken.username;
-            const user = await User.getUserByUsername(username);
-            return user
-        }else{
-            return null
+        try{
+
+            if (decodeToken && typeof decodeToken !== 'string' && 'username' in decodeToken) {
+                const username = decodeToken.username;
+                const user = await User.getUserByUsername(username);
+                return user
+            }else{
+                return null
+            }
+        }catch(error){
+            console.error("Error getting decoded user ", error);
         }
     }
     //post
@@ -80,22 +81,22 @@ class UserController{
             const findedUser = await User.getUserByUsername(username);
             
             if (!findedUser){
-                res.status(404).json({error: "User not finded"})
+                res.status(404).json({error: "User not finded"});
             }else{
 
                 //compare the hashed password with the password in the database
-                const comparisonResult = await bcrypt.compare(password, findedUser.password)
+                const comparisonResult = await bcrypt.compare(password, findedUser.password);
                 
                 if(comparisonResult){
-                    const token = this.generateToken(findedUser._id, username)
-                    res.status(200).json({token})
+                    const token = this.generateToken(findedUser._id, username);
+                    res.status(200).json({token});
                 }else{
-                    res.status(401).json({error: "Incorrect password"})
+                    res.status(401).json({error: "Incorrect password"});
                 }
             }
         }catch(error){
             console.log('Error finding the user in the database ',error);
-            res.status(500).json({error: 'internal error in the server'})
+            res.status(500).json({error: 'internal error in the server'});
         }
     }
     public async getUser(req: Request, res: Response){
@@ -103,7 +104,7 @@ class UserController{
 
         try{
             if (searchTerm){
-                const users = await User.getUserBySearch(searchTerm)
+                const users = await User.getUserBySearch(searchTerm);
                 if (users.length > 0){
                     res.status(200).json(users);
                 }else{
@@ -123,8 +124,13 @@ class UserController{
     
             const user = await this.getUserByDecodeToken(decodeToken);
             if (user){
-                user.socketId = socket.id
-                user.save()
+                user.socketId = socket.id;
+                user.save();
+                if (user.chats){
+                    for(let chat of user.chats){
+                        socket.join(chat.toString())
+                    }
+                }
             }
         }catch(error){
             console.error("Error in socket registration ",error);
@@ -132,48 +138,23 @@ class UserController{
         
     }
 
-    public async sendMessage(socket: Socket, data: any){
-        try{
-            const {token, usernameTo, contentMessage} = data;
-    
+    public async socketDisconnection(socket:Socket, data:any){
+        try {
+            const { token } = data;
             const decodeToken = this.decodeToken(token);
     
-            const userFrom = await this.getUserByDecodeToken(decodeToken);
-            const userTo = await User.getUserByUsername(usernameTo);
-            
-            if (userFrom && userTo){
-
-                let chat = await Chat.getChatByUsers(userFrom._id, userFrom._id,);
-                const message = await Message.createMessage({
-                    from:userFrom._id,
-                    to: userFrom._id,
-                    content: contentMessage
-                })
-                if(chat){
-                    chat.addMessage(message._id);
-                    userFrom.putChatFirst(chat._id);
-                    userTo.putChatFirst(chat._id);
-                }else{
-                    chat = await Chat.createChat({
-                        users: [userFrom._id, userTo._id]
-                    })
-                    userFrom.putNewChat(chat._id);
-                    userFrom.putNewChat(chat._id);
+            const user = await this.getUserByDecodeToken(decodeToken);
+            if(user){
+                if (user.chats){
+                    for(let chat of user.chats){
+                        socket.leave(chat.toString());
+                    }
                 }
-                if(userTo.socketId){
-                    socket.broadcast.to(chat._id.toString()).emit(
-                        'receivedMessage',{userFrom, userTo, message: contentMessage}
-                    )
-                }
-                socket.to(chat._id.toString()).emit(
-                    'sendMessage',{userFrom,userTo,message: contentMessage}
-                )
-
+                user.socketId = undefined;
+                user.save();
             }
-
-
         }catch(error){
-
+            console.error('error socket disconnecting ',error);
         }
     }
 }
