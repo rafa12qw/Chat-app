@@ -10,7 +10,7 @@ interface IMessage{
 
 interface MessageModel extends Model<IMessage>{
     createMessage(newMessage: IMessage): Promise<HydratedDocument<IMessage>>;
-    getMessageById(idMessage: Types.ObjectId): IMessage | null;
+    getMessageById(idMessage: Types.ObjectId): Promise<HydratedDocument<IMessage>>;
 }
 
 export { IMessage, MessageModel }

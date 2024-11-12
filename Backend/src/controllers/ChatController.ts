@@ -4,6 +4,7 @@ import UserController from "./UserController";
 import Message from "../models/Message";
 import { Socket } from "socket.io";
 import { Request, Response } from "express";
+import { Types } from "mongoose";
 class ChatController {
     private userController: UserController;
     constructor(){
@@ -22,7 +23,12 @@ class ChatController {
                 const user = await this.userController.getUserByDecodeToken(decodeToken);
 
                 if(user){
-                    let response = []; //here we stock the response of the api
+                    let response: {
+                        _id: Types.ObjectId;
+                        avatar: string | undefined;
+                        name: string | undefined;
+                        type: string;
+                    }[] = []; //here we stock the response of the api
                     const chats = await Chat.getAllChatsOfUser(user._id);
                     if (!chats) {
                         res.status(404).json({error : 'Not chats founded'});
@@ -40,14 +46,14 @@ class ChatController {
                                 const idUser = chat.users.find((id) => !id.equals(user._id))
                                 const userChat = await User.getUserById(idUser);
                                 response.push({
-                                    _id: userChat._id,
+                                    _id: chat._id,
                                     avatar: userChat.avatar,
                                     name: userChat.username,
                                     type: 'user'
                                 })
                             }
                         }
-                        res.status(201).json({chats: response});
+                        res.status(201).json(response);
                     }
                 }
             }
@@ -68,8 +74,9 @@ class ChatController {
             if (userFrom && userTo){
 
                 let chat = await Chat.getChatByUsers(userFrom._id, userFrom._id,);
+                let message;
                 if(chat){
-                    const message = await Message.createMessage({
+                    message = await Message.createMessage({
                         from:userFrom._id,
                         to: chat._id,
                         content: contentMessage
@@ -81,7 +88,7 @@ class ChatController {
                     chat = await Chat.createChat({
                         users: [userFrom._id, userTo._id]
                     })
-                    const message = await Message.createMessage({
+                    message = await Message.createMessage({
                         from:userFrom._id,
                         to: chat._id,
                         content: contentMessage
@@ -92,11 +99,23 @@ class ChatController {
                 }
                 if(userTo.socketId){
                     socket.broadcast.to(chat._id.toString()).emit(
-                        'receivedMessage',{userFrom, userTo, message: contentMessage}
+                        'receivedMessage',{
+                            avatar: userFrom.avatar,
+                            username: userFrom.username,
+                            message: message.content,
+                            createdAt: message.createdAt,
+                            type: 'to'
+                        }
                     )
                 }
-                socket.to(chat._id.toString()).emit(
-                    'sendMessage',{userFrom,userTo,message: contentMessage}
+                socket.emit(
+                    'sendMessage',{
+                        avatar: userFrom.avatar,
+                        username: userFrom.username,
+                        message: message.content,
+                        createdAt: message.createdAt,
+                        type: 'from'
+                    }
                 )
             }
 
@@ -107,6 +126,11 @@ class ChatController {
         }
     }
 
+    public async sendMessageToGroupe(socket: Socket, data: any){
+        try{
+            const {token, chatTo, contentMessage} = data;
+        }
+    }
 }
 
 
