@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
-import UserController from "./UserController";
-import Chat from "../models/Chat";
-import Message from "../models/Message";
-import User from "../models/User";
+import UserController from "./userController";
+import Chat from "../Models/Chat";
+import Message from "../Models/Message";
+import User from "../Models/User";
 
 class MessageController{
     private userController: UserController;

@@ -1,4 +1,4 @@
-import  User  from '../models/User'
+import  User  from '../Models/User'
 import dotenv from "dotenv"
 import jwt, { TokenExpiredError } from 'jsonwebtoken'
 import bcrypt from 'bcrypt'
@@ -6,8 +6,8 @@ import { IUser } from '../interfaces/IUser';
 import { Request, Response } from 'express';
 import { Server, Socket } from 'socket.io';
 import ChatController from './ChatController';
-import Chat from '../models/Chat';
-import Message from '../models/Message';
+import Chat from '../Models/Chat';
+import Message from '../Models/Message';
 import { Types } from 'mongoose';
 
 dotenv.config();

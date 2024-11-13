@@ -1,7 +1,7 @@
-import Chat from "../models/Chat";
-import User from "../models/User";
-import UserController from "./UserController";
-import Message from "../models/Message";
+import Chat from "../Models/Chat";
+import User from "../Models/User";
+import UserController from "./userController";
+import Message from "../Models/Message";
 import { Socket } from "socket.io";
 import { Request, Response } from "express";
 import { Types } from "mongoose";
