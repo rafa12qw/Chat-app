@@ -173,6 +173,51 @@ class ChatController {
             socket.emit('error', {error: 'internal server error'});
         }
     }
+
+    public async updateChats(socket: Socket, data: any){
+        const {token} = data;
+        try{
+            const decodeToken = this.userController.decodeToken(token);
+            const user = await this.userController.getUserByDecodeToken(decodeToken);
+            if(user){
+                let response: {
+                    _id: Types.ObjectId;
+                    avatar: string | undefined;
+                    name: string | undefined;
+                    type: string;
+                }[] = [];
+                const chats = await Chat.getAllChatsOfUser(user._id);
+                if (!chats) {
+                    socket.emit('error',{error : 'Chats not found'});
+                }else{
+                    for (let chat of chats){
+                        if (chat.nbUsers && chat.nbUsers > 2){
+                            response.push({
+                                _id: chat._id,
+                                avatar: chat.avatarGroupe,
+                                name: chat.nameGroupe,
+                                type: 'groupe'
+                            })
+                        }else{
+                            //if the chat is only of 2 people we stock the other user information
+                            const idUser = chat.users.find((id) => !id.equals(user._id))
+                            const userChat = await User.getUserById(idUser);
+                            response.push({
+                                _id: chat._id,
+                                avatar: userChat.avatar,
+                                name: userChat.username,
+                                type: 'user'
+                            })
+                        }
+                    }
+                    socket.emit('chatsUpdated', {response});
+                }
+            }
+        }catch(error){
+            console.error('error update chat ', error);
+            socket.emit('error', {error: 'Internal server error'});
+        }
+    }
 }
 
 

@@ -138,25 +138,7 @@ class UserController{
         
     }
 
-    public async socketDisconnection(socket:Socket, data:any){
-        try {
-            const { token } = data;
-            const decodeToken = this.decodeToken(token);
     
-            const user = await this.getUserByDecodeToken(decodeToken);
-            if(user){
-                if (user.chats){
-                    for(let chat of user.chats){
-                        socket.leave(chat.toString());
-                    }
-                }
-                user.socketId = undefined;
-                user.save();
-            }
-        }catch(error){
-            console.error('error socket disconnecting ',error);
-        }
-    }
 }
 
 export default UserController;
