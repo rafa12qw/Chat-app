@@ -5,6 +5,8 @@ import Message from "../models/Message";
 import { Socket } from "socket.io";
 import { Request, Response } from "express";
 import { Types } from "mongoose";
+import { error } from "console";
+import internal from "stream";
 class ChatController {
     private userController: UserController;
     constructor(){
@@ -96,20 +98,24 @@ class ChatController {
                     chat.addMessage(message._id);
                     userFrom.putNewChat(chat._id);
                     userFrom.putNewChat(chat._id);
+                    socket.join(chat._id.toString());
+                    if (userTo.socketId) {
+                        socket.to(userTo.socketId).socketsJoin(chat._id.toString());
+                    }
                 }
-                if(userTo.socketId){
-                    socket.broadcast.to(chat._id.toString()).emit(
-                        'receivedMessage',{
-                            avatar: userFrom.avatar,
-                            username: userFrom.username,
-                            message: message.content,
-                            createdAt: message.createdAt,
-                            type: 'to'
-                        }
-                    )
-                }
+                
+                socket.to(chat._id.toString()).emit(
+                    'receivedMessage',{
+                        avatar: userFrom.avatar,
+                        username: userFrom.username,
+                        message: message.content,
+                        createdAt: message.createdAt,
+                        type: 'to'
+                    }
+                )
+                
                 socket.emit(
-                    'sendMessage',{
+                    'messageSent',{
                         avatar: userFrom.avatar,
                         username: userFrom.username,
                         message: message.content,
@@ -128,7 +134,43 @@ class ChatController {
 
     public async sendMessageToGroupe(socket: Socket, data: any){
         try{
-            const {token, chatTo, contentMessage} = data;
+            const {token, idChat, contentMessage} = data;
+
+            const decodeToken = this.userController.decodeToken(token);
+            const userFrom = await this.userController.getUserByDecodeToken(decodeToken);            
+            const chat = await Chat.getChatById(idChat);
+
+            if(!chat || !userFrom){
+                socket.emit('error', {error: 'Chat or user not found in database'});
+            }else{
+                const message = new Message({
+                    from: userFrom?._id,
+                    to: chat._id,
+                    content: contentMessage
+                });
+                chat.addMessage(message._id);
+                const users = await User.getUsersOfGroupChat(chat._id);
+                for(let user of users){
+                    user.putChatFirst(chat._id);
+                }
+                socket.to(chat._id.toString()).emit('receivedMessage',{
+                    avatar: userFrom.avatar,
+                    username: userFrom.username,
+                    message: message.content,
+                    createdAt: message.createdAt,
+                    type: 'to'
+                })
+                socket.emit('messageSent',{
+                    avatar: userFrom.avatar,
+                    username: userFrom.username,
+                    message: message.content,
+                    createdAt: message.createdAt,
+                    type: 'from'
+                })
+            }
+        }catch{
+            console.error('Error sending message to groupe');
+            socket.emit('error', {error: 'internal server error'});
         }
     }
 }

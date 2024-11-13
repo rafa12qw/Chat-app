@@ -1,4 +1,4 @@
-import { model, Schema } from "mongoose";
+import { model, Schema, Types } from "mongoose";
 import { IUser, IUserMethods, UserModel } from "../interfaces/IUser";
 import { IChat } from "../interfaces/IChat";
 import Chat from './Chat'
@@ -29,7 +29,10 @@ userSchema.static('getBySearch', async function getBySearch(searchTerm){
     return user;
 })
 
-
+userSchema.static('getUsersOfGroupChat', async function getUsersOfGroupChat(idChat: Types.ObjectId){
+    const users = await this.find({chats: {$in: idChat}});
+    return users;
+})
 
 userSchema.method('putChatInFirst', function(id){
     if (!this.chats){
