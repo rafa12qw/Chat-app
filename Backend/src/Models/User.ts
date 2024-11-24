@@ -19,13 +19,13 @@ userSchema.static('getById', async function getById(id: string){
     return user // it could be null 
 })
 
-userSchema.static('getByUsername', async function getByUsername(username){
+userSchema.static('getUserByUsername', async function getUserByUsername(username){
     const user = await this.findOne({username})
     return user
 })
 
-userSchema.static('getBySearch', async function getBySearch(searchTerm){
-    const user = await this.findOne({username: { $regex: searchTerm, $options: 'i' }})
+userSchema.static('getUserBySearch', async function getUserBySearch(searchTerm){
+    const user = await this.find({username: { $regex: searchTerm, $options: 'i' }})
     return user;
 })
 
