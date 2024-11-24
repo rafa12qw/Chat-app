@@ -4,24 +4,41 @@ on:
   push:
     branches: ["main", "develop"]
     paths:
-      - 'Backend/**'
+      - 'backend/**'  # Asegúrate de usar la ruta correcta
   pull_request:
     branches: ["main", "develop"]
     paths:
-      - 'Backend/**'
-
+      - 'backend/**'
+env:
+  JWT_SECRET_KEY=9d871b49cb01fe12a10636e3e740547fcf9a53126c7a15e99975125b1e349bb5
+  MONGODB_URI=mongodb+srv://rasdecom:OD400CDk3AuI9Of2@cluster0.fmb2h4q.mongodb.net/
 jobs:
   build:
 
     runs-on: ubuntu-latest
 
+    strategy:
+      matrix:
+        node-version: 20  # Especifica las versiones de Node.js que quieres probar
+
     steps:
-    - uses: actions/checkout@v4
-      name: Use Node.js ${{ matrix.node-version }}
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
-    - run: npm ci
-    - run: npm run dev --if-present
-    - run: npm test
+
+    - name: Install dependencies
+      working-directory: ./backend
+      run: npm ci
+
+    - name: Run development server (if applicable)
+      working-directory: ./backend
+      run: npm run dev --if-present
+
+    - name: Run tests
+      working-directory: ./backend
+      run: npm test
