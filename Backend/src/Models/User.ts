@@ -1,7 +1,5 @@
 import { model, Schema, Types } from "mongoose";
 import { IUser, IUserMethods, UserModel } from "../interfaces/IUser";
-import { IChat } from "../interfaces/IChat";
-import Chat from './Chat'
 const userSchema = new Schema<IUser, UserModel, IUserMethods>({
     username: {type: String, required:true},
     password: {type: String, required: true},
