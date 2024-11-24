@@ -5,8 +5,6 @@ import Message from "../Models/Message";
 import { Socket } from "socket.io";
 import { Request, Response } from "express";
 import { Types } from "mongoose";
-import { error } from "console";
-import internal from "stream";
 class ChatController {
     private userController: UserController;
     constructor(){
