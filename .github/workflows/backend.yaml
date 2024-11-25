@@ -9,7 +9,9 @@ on:
     branches: ["main", "develop"]
     paths:
       - 'backend/**'
-
+env:
+  JWT_SECRET_KEY: ${{secrets.JWT_SECRET_KEY}}
+  MONGODB_URI: ${{secrets.MONGODB_URI}}
 jobs:
   build:
 
