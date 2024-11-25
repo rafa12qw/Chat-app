@@ -10,8 +10,8 @@ on:
     paths:
       - 'backend/**'
 env:
-  JWT_SECRET_KEY=9d871b49cb01fe12a10636e3e740547fcf9a53126c7a15e99975125b1e349bb5
-  MONGODB_URI=mongodb+srv://rasdecom:OD400CDk3AuI9Of2@cluster0.fmb2h4q.mongodb.net/
+  JWT_SECRET_KEY: ${{secrets.JWT_SECRET_KEY}}
+  MONGODB_URI: ${{secrets.MONGODB_URI}}
 jobs:
   build:
 
