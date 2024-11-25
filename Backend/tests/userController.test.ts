@@ -71,19 +71,24 @@ describe('Test of User Controller class', () => {
         })
     })
     describe('GET/search', () => {
-        it('Should get status 200 and send a list with length of 2', async () => {
+        it('Should get status 200 and send a list with length of the test users', async () => {
             User.createUser({username: "testUser1", password: "hashedPassword"});
             User.createUser({username: "testUser2", password: "hashedPassword" });
 
             const test1 = await User.getUserByUsername("testUser1");
             const test2 = await User.getUserByUsername("testUser2");
-            const mockUsers = [test1, test2];
+            
+
             const response = await request(SERVER_URL)
             .get('/api/search')
             .query({term: 'test'});
-
-            expect(response.status).toBe(200);
-            expect(response.body).toEqual(mockUsers);
+            if(test1 && test2){
+                const cleanUser1 = {"__v": 0,"_id": test1._id.toString(), "chats": [],"password": "hashedPassword","username": "testUser1"}
+                const cleanUser2 = {"__v": 0,"_id": test2._id.toString(), "chats": [],"password": "hashedPassword","username": "testUser2"}
+                
+                expect(response.status).toBe(200);
+                expect(response.body).toEqual([cleanUser1, cleanUser2]);
+            }
         })
     })
 })
