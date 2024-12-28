@@ -1,0 +1,63 @@
+name: Backend CI
+
+on: 
+  push:
+    branches: ["main", "develop"]
+    paths:
+      - 'backend/**'  
+  pull_request:
+    branches: ["main", "develop"]
+    paths:
+      - 'backend/**'
+env:
+  JWT_SECRET_KEY: ${{secrets.JWT_SECRET_KEY}}
+  MONGODB_URI: ${{secrets.MONGODB_URI}}
+jobs:
+  install:
+   runs-on: ubuntu-latest
+   strategy:
+      matrix:
+        node-version: [20]
+   steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+
+    - name: Install dependencies
+      working-directory: ./backend
+      run: npm ci
+  
+  build:
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [20] 
+    steps:
+      - name: Build server 
+        working-directory: ./backend
+        run: npm run build
+  start: 
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [20] 
+    steps:
+    - name: Start server
+      working-directory: ./backend
+      run: npm run start
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [20] 
+    steps:
+    - name: Run tests
+      working-directory: ./backend
+      run: npm test

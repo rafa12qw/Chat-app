@@ -18,7 +18,7 @@ interface UserModel extends Model<IUser, {},IUserMethods>{
     getUsersFromUser(ids?: Types.ObjectId): Promise<HydratedDocument<IUser,IUserMethods>[]>;
     createUser(newUser: IUser): Promise<HydratedDocument<IUser,IUserMethods>>;
     getUserById(id?: Types.ObjectId): Promise<HydratedDocument<IUser,IUserMethods>>;
-    getUserByUsername(username: string): Promise<HydratedDocument<IUser,IUserMethods>>;
+    getUserByUsername(username: string): Promise<HydratedDocument<IUser,IUserMethods> | null >;
     getUserBySearch(searchTerm: any):  Promise<HydratedDocument<IUser,IUserMethods>[]>;
     getUsersOfGroupChat(idChat: Types.ObjectId):  Promise<HydratedDocument<IUser,IUserMethods>[]>;
 }

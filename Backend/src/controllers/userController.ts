@@ -1,13 +1,9 @@
 import  User  from '../Models/User'
 import dotenv from "dotenv"
-import jwt, { TokenExpiredError } from 'jsonwebtoken'
+import jwt from 'jsonwebtoken'
 import bcrypt from 'bcrypt'
-import { IUser } from '../interfaces/IUser';
 import { Request, Response } from 'express';
-import { Server, Socket } from 'socket.io';
-import ChatController from './ChatController';
-import Chat from '../Models/Chat';
-import Message from '../Models/Message';
+import { Socket } from 'socket.io';
 import { Types } from 'mongoose';
 
 dotenv.config();
@@ -52,21 +48,21 @@ class UserController{
         }
     }
     //post
-    public async singUp(req:Request, res:Response): Promise<void>{
+    public async signUp(req:Request, res:Response){
         const{ username, password } = req.body;
         try{
             const existingUser = await User.getUserByUsername(username);
             
             if(existingUser){
-                res.status(400).json({error: "This user already exists"})
+                res.status(400).send({error: "This user already exists"});
+                return;
             }
-            
             const hashedPassword = await bcrypt.hash(password,10);
             const newUser = await User.createUser({
                 username,
                 password: hashedPassword
             })
-            
+            console.log(newUser);
             const token = this.generateToken(newUser._id, newUser.username);
             res.status(200).json({token});
         }catch(error){
@@ -81,7 +77,8 @@ class UserController{
             const findedUser = await User.getUserByUsername(username);
             
             if (!findedUser){
-                res.status(404).json({error: "User not finded"});
+                res.status(404).send({error: "User not found"});
+                return;
             }else{
 
                 //compare the hashed password with the password in the database
@@ -89,9 +86,11 @@ class UserController{
                 
                 if(comparisonResult){
                     const token = this.generateToken(findedUser._id, username);
-                    res.status(200).json({token});
+                    res.status(200).send({token});
+                    return;
                 }else{
-                    res.status(401).json({error: "Incorrect password"});
+                    res.status(401).send({error: "Incorrect password"});
+                    return;
                 }
             }
         }catch(error){
@@ -107,10 +106,12 @@ class UserController{
                 const users = await User.getUserBySearch(searchTerm);
                 if (users.length > 0){
                     res.status(200).json(users);
+                    return;
                 }else{
                     res.status(404).json({error: 'Not users finded'});
+                    return;
                 }
-            }
+            }   
         }catch(error){
             console.log('Error searching users ', error);
             res.status(500).json({error: 'Internal server error'});

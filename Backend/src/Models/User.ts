@@ -1,7 +1,5 @@
 import { model, Schema, Types } from "mongoose";
 import { IUser, IUserMethods, UserModel } from "../interfaces/IUser";
-import { IChat } from "../interfaces/IChat";
-import Chat from './Chat'
 const userSchema = new Schema<IUser, UserModel, IUserMethods>({
     username: {type: String, required:true},
     password: {type: String, required: true},
@@ -19,13 +17,13 @@ userSchema.static('getById', async function getById(id: string){
     return user // it could be null 
 })
 
-userSchema.static('getByUsername', async function getByUsername(username){
+userSchema.static('getUserByUsername', async function getUserByUsername(username){
     const user = await this.findOne({username})
     return user
 })
 
-userSchema.static('getBySearch', async function getBySearch(searchTerm){
-    const user = await this.findOne({username: { $regex: searchTerm, $options: 'i' }})
+userSchema.static('getUserBySearch', async function getUserBySearch(searchTerm){
+    const user = await this.find({username: { $regex: searchTerm, $options: 'i' }})
     return user;
 })
 
