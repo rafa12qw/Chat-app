@@ -24,7 +24,7 @@ jobs:
           node-version: ${{ matrix.node-version }}
 
       - name: Install dependencies
-        working-directory: /backend  # 🔹 Cambiado a la ruta correcta (/backend)
+        working-directory: ./Backend  # 🔹 Cambiado a la ruta correcta (/backend)
         run: npm ci
 
   build:
@@ -40,7 +40,7 @@ jobs:
           node-version: 20
 
       - name: Build server
-        working-directory: /backend  # 🔹 Cambiado a la ruta correcta (/backend)
+        working-directory: ./Backend  # 🔹 Cambiado a la ruta correcta (/backend)
         run: npm run build
 
   start:
@@ -51,10 +51,10 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: backend-build
-          path: /backend  # 🔹 Cambiado a la ruta correcta (/backend)
+          path: ./Backend  # 🔹 Cambiado a la ruta correcta (/backend)
 
       - name: Start server
-        working-directory: /backend  # 🔹 Cambiado a la ruta correcta (/backend)
+        working-directory: ./Backend  # 🔹 Cambiado a la ruta correcta (/backend)
         run: npm run start
 
   test:
@@ -70,7 +70,7 @@ jobs:
           node-version: 20
 
       - name: Run tests
-        working-directory: /backend  # 🔹 Cambiado a la ruta correcta (/backend)
+        working-directory: ./Backend  # 🔹 Cambiado a la ruta correcta (/backend)
         run: npm test -- --coverage
 
       - name: Upload test coverage report
